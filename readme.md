@@ -1,3 +1,17 @@
+
+Run it if you want to develop
+
+`npm i`
+
+`npm run start`
+
+If you want to build
+
+`npm i`
+
+`npm run build`
+
+
 https://fundraiseup.notion.site/Frontend-test-dba2aced238f42318ca7e3982e23f84a
 
 # Задача

@@ -5,21 +5,39 @@
     <title>English Vocabulary Trainer</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
           integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
 </head>
 <body>
-<div class="container py-5">
-    <div class="d-flex flex-column align-items-center w-100 text-center mx-auto">
-        <h2 class="mb-5">English Vocabulary Trainer</h2>
+    <div class="container py-5">
+        <div class="d-flex flex-column align-items-center w-100 text-center mx-auto">
+            <h2 class="mb-5">English Vocabulary Trainer</h2>
 
-        <p class="lead mb-1">Form a valid English word using the given letters</p>
-        <p class="mb-5">Question <span id="current_question">1</span> of <span id="total_questions">10</span></p>
+            <p class="lead mb-1">Form a valid English word using the given letters</p>
+            <p class="mb-5">Question <span id="current_question">1</span> of <span id="total_questions">10</span></p>
 
-        <div>
-            <div id="answer" class="bg-light mx-1 mb-3" style="height: 46px; border-radius: 6px"></div>
-            <div id="letters"></div>
+            <div>
+                <div id="answer" class="d-flex bg-light mx-1 mb-3" style="height: 46px; border-radius: 6px"></div>
+                <div id="letters" class="d-flex justify-content-center"></div>
+            </div>
         </div>
     </div>
-</div>
 
+    <div class="modal" id="stats" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Stats</h5>
+                </div>
+                <div class="modal-body d-flex flex-column" id="stats-modal-body">
+
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div>
+                        <h3>Press ESC or Enter to continue</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

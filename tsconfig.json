@@ -5,12 +5,17 @@
     "module": "ESNext",
     "target": "ES6",
     "allowJs": false,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "@shared/*": ["./src/shared/*"],
+      "@services/*": ["./src/services/*"],
+    }
   },
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS"
     },
   },
-  "files": ["src/index.ts"]
+  "include": ["./src"],
+
 }

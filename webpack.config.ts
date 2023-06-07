@@ -6,7 +6,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 import "webpack-dev-server";
 
 const config: webpack.Configuration = {
-  entry: "./src/index.ts",
+  entry: { main: "./src/index.ts" },
   output: {
     path: path.resolve(__dirname, "dist"),
     clean: true,
@@ -44,6 +44,10 @@ const config: webpack.Configuration = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
+    alias: {
+      "@shared": path.resolve(__dirname, "src", "shared"),
+      "@services": path.resolve(__dirname, "src", "services"),
+    },
   },
 };
 
