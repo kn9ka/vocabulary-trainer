@@ -1,15 +1,16 @@
-import { ExtendedButtonEvent } from "@services/button.service";
+import type { ExtendedButtonEvent } from "@services/button.service";
 import { GameService } from "@services/game.service";
 import { UIService } from "@services/ui.service";
 import { StatsService } from "@services/stats.service";
 
 import {
-  ANSWER_CONTAINER_ID as RESULT_CONTAINER_ID,
+  RESULT_CONTAINER_ID,
   VARIANTS_CONTAINER_ID,
   CURRENT_QUESTION_CONTAINER_ID,
   TOTAL_QUESTIONS_CONTAINER_ID,
   MODAL_CONTAINER_ID,
   MODAL_BODY_CONTAINER_ID,
+  TASK_COUNT,
 } from "@shared/constants";
 
 const words = [
@@ -34,30 +35,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const game = () => {
   const uiService = new UIService(resultContainer, variantsContainer);
-  const gameService = new GameService(words, { taskCount: 6 });
+  const gameService = new GameService(words, { taskCount: TASK_COUNT });
 
-  const totalQuestionEl = document.getElementById(TOTAL_QUESTIONS_CONTAINER_ID);
-  totalQuestionEl.innerHTML = `${gameService.wordsCount}`;
+  const totalQuestionCountEl = document.getElementById(
+    TOTAL_QUESTIONS_CONTAINER_ID
+  );
+  totalQuestionCountEl.innerHTML = `${gameService.wordsCount}`;
 
   uiService.setAnswerLetters(gameService.letters);
   uiService.setVariantLetters(gameService.shuffledLetters);
 
   const handleVariantClick = (e: ExtendedButtonEvent) => {
-    const target = e.target;
+    const currentVariantEl = e.target;
     const value = e.target.dataset.value;
 
-    const correctVariant = gameService.checkLetter(value);
-    const errorCount = gameService.currentWordErrorCount;
+    const isCorrectLetter = gameService.checkLetter(value);
+    const currentErrorCount = gameService.currentWordErrorCount;
 
-    if (errorCount === 3) {
-      uiService.getCorrectOrder();
-    }
-
-    if (correctVariant) {
-      target.success();
-    } else {
-      target.error();
-    }
+    if (isCorrectLetter) currentVariantEl.success();
+    if (!isCorrectLetter && currentErrorCount < 3) currentVariantEl.error();
+    if (currentErrorCount >= 3) uiService.getCorrectOrder();
   };
 
   uiService.setVariantClick(handleVariantClick);
@@ -68,21 +65,15 @@ const game = () => {
     const lowerSymbol = symbol && symbol.toLowerCase();
 
     if (lowerSymbol && gameService.letters.includes(lowerSymbol)) {
-      const variantElement = uiService.findVariantElement(lowerSymbol);
-      const correctVariant = gameService.checkLetter(lowerSymbol);
+      const variantEl = uiService.findVariantElement(lowerSymbol);
+      const isCorrectLetter = gameService.checkLetter(lowerSymbol);
+      const currentErrorCount = gameService.currentWordErrorCount;
 
-      if (correctVariant) {
-        variantElement.success();
-      }
-      if (gameService.currentWordErrorCount < 3) {
-        variantElement.error();
-      }
+      if (isCorrectLetter) variantEl.success();
+      if (!isCorrectLetter && currentErrorCount < 3) variantEl.error();
+      if (currentErrorCount >= 3) uiService.getCorrectOrder();
     } else {
-      gameService.increaseErrorCount();
-    }
-
-    if (gameService.currentWordErrorCount === 3) {
-      uiService.getCorrectOrder();
+      if (gameService.increaseErrorCount() >= 3) uiService.getCorrectOrder();
     }
   };
 
@@ -95,10 +86,10 @@ const game = () => {
         uiService.setVariantLetters(gameService.shuffledLetters);
         uiService.draw();
 
-        const currentQuestionEl = document.getElementById(
+        const currentQuestionNumberEl = document.getElementById(
           CURRENT_QUESTION_CONTAINER_ID
         );
-        currentQuestionEl.innerHTML = `${gameService.passedCount}`;
+        currentQuestionNumberEl.innerHTML = `${gameService.passedCount}`;
       } else {
         const modalContainer = document.getElementById(MODAL_CONTAINER_ID);
         const modalBody = document.getElementById(MODAL_BODY_CONTAINER_ID);

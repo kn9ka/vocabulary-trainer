@@ -4,7 +4,12 @@ type Stats = {
   mostErrorWord: string;
 };
 
-export class StatsService {
+interface StatsServiceInterface {
+  draw: (stats: Stats) => void;
+  show: () => void;
+  hide: () => void;
+}
+export class StatsService implements StatsServiceInterface {
   container: HTMLElement;
   body: HTMLElement;
 
@@ -15,6 +20,7 @@ export class StatsService {
 
   draw(stats: Stats) {
     const { mostErrorWord, errorCount, wordsWithoutError } = stats;
+
     const fragment = document.createDocumentFragment();
     const wordsWithoutErrorsEl = Object.assign(document.createElement("span"), {
       innerHTML: `Words without error: <b>${wordsWithoutError}</b>`,

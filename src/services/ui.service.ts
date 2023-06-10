@@ -1,8 +1,8 @@
-import { ButtonService } from "./button.service";
+import { ButtonService } from "@services/button.service";
 import type {
   ExtendedButtonEvent,
   ExtendedHTMLButtonElement,
-} from "./button.service";
+} from "@services/button.service";
 
 import { INVISIBLE_CLASS, ERROR_CLASS, SUCCESS_CLASS } from "@shared/constants";
 
@@ -11,7 +11,7 @@ enum ContainerType {
   Answer = "answer",
 }
 
-type UIServiceInterface = {
+interface UIServiceInterface {
   draw: () => void;
   clear: () => void;
   setAnswerLetters: (letters: string[]) => void;
@@ -19,7 +19,7 @@ type UIServiceInterface = {
   setVariantClick: (callback: (e: ExtendedButtonEvent) => void) => void;
   getCorrectOrder: () => void;
   findVariantElement: (letter: string) => ExtendedHTMLButtonElement | null;
-};
+}
 
 export class UIService implements UIServiceInterface {
   answerContainer: HTMLElement = null;
@@ -36,6 +36,44 @@ export class UIService implements UIServiceInterface {
     this.variantsContainer = variantsContainer;
 
     this.elementService = new ButtonService();
+  }
+
+  private createUIElements(letters: string[], type: ContainerType) {
+    const fragment = document.createDocumentFragment();
+
+    letters.forEach((letter) => {
+      fragment.appendChild(
+        this.elementService.create({
+          value: letter,
+          visible: type === ContainerType.Variant,
+          className: type === ContainerType.Answer ? SUCCESS_CLASS : "",
+          onSuccess: (currentElement) => {
+            const answerEl = this.findAnswerElement(letter);
+
+            currentElement.hide();
+            answerEl?.show();
+          },
+          onClick: this.onVariantChoose,
+        })
+      );
+    });
+
+    return fragment;
+  }
+
+  private findAnswerElement(letter: string): ExtendedHTMLButtonElement | null {
+    for (let node of this.answerContainer.childNodes) {
+      const element = node as ExtendedHTMLButtonElement;
+
+      if (
+        element.getAttribute("data-value") === letter &&
+        element.classList.contains(INVISIBLE_CLASS)
+      ) {
+        return element;
+      }
+    }
+
+    return null;
   }
 
   draw() {
@@ -91,49 +129,7 @@ export class UIService implements UIServiceInterface {
     });
   }
 
-  private createUIElements(letters: string[], type: ContainerType) {
-    const fragment = document.createDocumentFragment();
-
-    letters.forEach((letter) => {
-      fragment.appendChild(
-        this.elementService.create({
-          value: letter,
-          visible: type === ContainerType.Variant,
-          className: type === ContainerType.Answer ? SUCCESS_CLASS : "",
-          onSuccess: (currentElement) => {
-            const answerEl = this.findAnswerElement(letter);
-
-            currentElement.hide();
-            answerEl?.show();
-          },
-          onError: (currentElement) => {},
-          onClick: this.onVariantChoose,
-        })
-      );
-    });
-
-    return fragment;
-  }
-
-  private findAnswerElement(letter: string): ExtendedHTMLButtonElement | null {
-    let answerElement: ExtendedHTMLButtonElement | null = null;
-
-    for (let node of this.answerContainer.childNodes) {
-      const element = node as ExtendedHTMLButtonElement;
-
-      if (
-        element.getAttribute("data-value") === letter &&
-        element.classList.contains(INVISIBLE_CLASS)
-      ) {
-        return element;
-      }
-    }
-
-    return answerElement;
-  }
-
   findVariantElement(letter: string): ExtendedHTMLButtonElement | null {
-    let variantElement: ExtendedHTMLButtonElement | null = null;
     for (let node of this.variantsContainer.childNodes) {
       const element = node as ExtendedHTMLButtonElement;
 
@@ -145,6 +141,6 @@ export class UIService implements UIServiceInterface {
       }
     }
 
-    return variantElement;
+    return null;
   }
 }

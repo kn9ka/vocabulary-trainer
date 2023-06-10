@@ -28,22 +28,10 @@ const config: webpack.Configuration = {
         loader: "babel-loader",
         exclude: ["/node_modules/"],
       },
-      {
-        test: /\.s[ac]ss$/i,
-        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
-      },
-      {
-        test: /\.css$/i,
-        use: ["style-loader", "css-loader", "postcss-loader"],
-      },
-      {
-        test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
-        type: "asset",
-      },
     ],
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
+    extensions: [".tsx", ".ts", ".jsx", ".js"],
     alias: {
       "@shared": path.resolve(__dirname, "src", "shared"),
       "@services": path.resolve(__dirname, "src", "services"),

@@ -20,7 +20,7 @@ type GameServiceInterface = {
   wordsCount: number;
   mostErrorWord: string;
   wordCountWithoutError: number;
-  increaseErrorCount: () => void;
+  increaseErrorCount: () => number;
   checkLetter: (letter: string) => boolean;
   getNewWord: () => string;
 };
@@ -42,6 +42,25 @@ export class GameService implements GameServiceInterface {
         shuffledLetters: shuffle(word.split("")),
       };
     });
+  }
+
+  private setRandomWord() {
+    const unusedWords = Object.values(this.words)
+      .filter((word) => word.usedCount == 0)
+      .map((word) => word);
+
+    const wordsCount = unusedWords.length;
+
+    if (wordsCount === 0) {
+      return null;
+    }
+
+    const randomIndex = randomIntFromInterval(0, wordsCount - 1);
+    const word = unusedWords[randomIndex];
+
+    word.usedCount += 1;
+    this.currentWord = word;
+    return word.value;
   }
 
   get letters() {
@@ -99,6 +118,7 @@ export class GameService implements GameServiceInterface {
 
   increaseErrorCount() {
     this.currentWord.errors += 1;
+    return this.currentWord.errors;
   }
 
   checkLetter(letter: string) {
@@ -122,24 +142,5 @@ export class GameService implements GameServiceInterface {
 
     const word = this.setRandomWord();
     return word;
-  }
-
-  private setRandomWord() {
-    const unusedWords = Object.values(this.words)
-      .filter((word) => word.usedCount == 0)
-      .map((word) => word);
-
-    const wordsCount = unusedWords.length;
-
-    if (wordsCount === 0) {
-      return null;
-    }
-
-    const randomIndex = randomIntFromInterval(0, wordsCount - 1);
-    const word = unusedWords[randomIndex];
-
-    word.usedCount += 1;
-    this.currentWord = word;
-    return word.value;
   }
 }

@@ -5,20 +5,6 @@ import {
   ERROR_CLASS,
 } from "@shared/constants";
 
-export type ExtendedButtonEvent = MouseEvent & {
-  target: EventTarget & ExtendedHTMLButtonElement;
-};
-export type ExtendedHTMLButtonElement = HTMLButtonElement & CustomButton;
-
-type CreateButtonParams = {
-  value: string;
-  visible: boolean;
-  className?: string;
-  onClick: (e: ExtendedButtonEvent) => void;
-  onSuccess: (element: ExtendedHTMLButtonElement) => void;
-  onError: (element: ExtendedHTMLButtonElement) => void;
-};
-
 type CustomButton = {
   value: string;
   hide: () => void;
@@ -27,11 +13,50 @@ type CustomButton = {
   error: () => void;
 };
 
-type ButtonServiceInterface = {
-  create: (params: CreateButtonParams) => ExtendedHTMLButtonElement;
+export type ExtendedHTMLButtonElement = HTMLButtonElement & CustomButton;
+
+export type ExtendedButtonEvent = MouseEvent & {
+  target: EventTarget & ExtendedHTMLButtonElement;
 };
 
+type CreateButtonParams = {
+  value: string;
+  visible: boolean;
+  className?: string;
+  onClick: (e: ExtendedButtonEvent) => void;
+  onSuccess?: (element: ExtendedHTMLButtonElement) => void;
+  onError?: (element: ExtendedHTMLButtonElement) => void;
+};
+
+interface ButtonServiceInterface {
+  create: (params: CreateButtonParams) => ExtendedHTMLButtonElement;
+}
+
 export class ButtonService implements ButtonServiceInterface {
+  private addSuccessClass(element: ExtendedHTMLButtonElement) {
+    element.classList.add(SUCCESS_CLASS);
+  }
+
+  private toggleErrorClass(element: ExtendedHTMLButtonElement) {
+    if (element.classList.contains(ERROR_CLASS)) {
+      return;
+    }
+
+    element.classList.add(ERROR_CLASS);
+
+    setTimeout(() => {
+      element.classList.remove(ERROR_CLASS);
+    }, 200);
+  }
+
+  private show(element: ExtendedHTMLButtonElement) {
+    element.classList.remove(INVISIBLE_CLASS);
+  }
+
+  private hide(element: ExtendedHTMLButtonElement) {
+    element.classList.add(INVISIBLE_CLASS);
+  }
+
   create({
     value,
     visible,
@@ -51,12 +76,16 @@ export class ButtonService implements ButtonServiceInterface {
 
     const extendedOptions = {
       success: () => {
-        onSuccess(element);
-        this.onSuccess(element);
+        if (typeof onSuccess === "function") {
+          onSuccess(element);
+        }
+        this.addSuccessClass(element);
       },
       error: () => {
-        onError(element);
-        this.onError(element);
+        if (typeof onError === "function") {
+          onError(element);
+        }
+        this.toggleErrorClass(element);
       },
       hide: () => this.hide(element),
       show: () => this.show(element),
@@ -69,25 +98,5 @@ export class ButtonService implements ButtonServiceInterface {
 
     element.setAttribute("data-value", value);
     return element;
-  }
-
-  private onSuccess(element: ExtendedHTMLButtonElement) {
-    element.classList.add(SUCCESS_CLASS);
-  }
-  private onError(element: ExtendedHTMLButtonElement) {
-    if (element.classList.contains(ERROR_CLASS)) {
-      return;
-    }
-    element.classList.add(ERROR_CLASS);
-    setTimeout(() => {
-      element.classList.remove(ERROR_CLASS);
-    }, 200);
-  }
-  private show(element: ExtendedHTMLButtonElement) {
-    element.classList.remove(INVISIBLE_CLASS);
-  }
-
-  private hide(element: ExtendedHTMLButtonElement) {
-    element.classList.add(INVISIBLE_CLASS);
   }
 }
